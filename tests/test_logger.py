@@ -19,9 +19,9 @@ kusto_handler.setFormatter(formatter)
 
 logger.addHandler(kusto_handler)
 
-log = ">"
-while log.strip().lower() != "quit":
+while True:
     log = input("> ")
-    logger.info(log)
-
-logger.handlers[0].close()
+    if log.strip().lower() != "quit":
+        logger.info(log)
+    else:
+        break

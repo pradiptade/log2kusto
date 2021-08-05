@@ -3,7 +3,7 @@ import pandas as pd
 import kusto_tools.k_io.kusto_io as kio
 
 
-DEFAULT_ATTRIBUTES_LIST = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'msg']
+DEFAULT_ATTRIBUTES_LIST = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'msg', 'message', 'env']
 class KustoHandler(logging.Handler):
 
     def __init__(self, cluster, database, tablename ) -> None:
@@ -28,11 +28,11 @@ class KustoHandler(logging.Handler):
         print(self.log_rows_list)
 
     def close(self):
-        print("calling close")
+        #print("calling close")
         super().close()
 
     def flush(self):
-        print("calling flush")
+        #print("calling flush")
         log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
         print(log_df)
         #self.db_conn.write_pandas_to_table(log_df, self.tablename)

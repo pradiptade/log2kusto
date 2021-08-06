@@ -15,7 +15,7 @@ class CustomFormatter(logging.Formatter):
         return super().format(record)
 
 #https://docs.python.org/3/library/logging.html#logrecord-attributes
-logrecord_attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message', 'domain']
+logrecord_attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message']
 custom_attributes_list = ['env', 'domain']
 all_attributes_list = logrecord_attributes_list + custom_attributes_list
 formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(all_attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \

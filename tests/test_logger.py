@@ -1,6 +1,18 @@
 import logging
 from log2kusto.kusto_handler import KustoHandler
 
+
+def send_info(log, d={}):
+    logger.info(log, extra=d)
+
+def send_warn(log, d={}):
+    logger.warn(log)
+
+def send_error(log, d={}):
+    logger.error(log)
+
+def send_critical(log, d={}):
+    logger.critical(log)
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style='%', validate=True, attributes_list=[]):
         super().__init__(fmt, datefmt, style, validate)
@@ -29,13 +41,14 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(kusto_handler)
 
-d = {'env':'stage', 'domain':'xyz'}
+d = {'env':'stage', 'domain':'azqualify'}
 while True:
     log = input("> ")
     if log.strip().lower() != "quit":
-        logger.warn(log)
-        logger.info(log, extra=d)
+        send_info(log, d)
+        send_warn(log, d)
+        send_error(log)
+        send_critical(log)
     else:
         break
-
 

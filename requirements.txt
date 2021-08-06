@@ -7,3 +7,5 @@ azure-storage-queue==2.1.0
 msrestazure==0.6.3
 pandas
 numpy
+
+twine==1.13.0

@@ -17,8 +17,6 @@ pip install log2kusto
 ## Usage
 
 ```python
-from log2kusto.kusto_handler import KustoHandler 
-
 import logging
 from log2kusto.kusto_handler import KustoHandler
 

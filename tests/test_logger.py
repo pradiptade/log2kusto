@@ -1,5 +1,5 @@
 import logging
-from logging_kusto.kusto_handler import KustoHandler
+from log2kusto.kusto_handler import KustoHandler
 
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style='%', validate=True, attributes_list=[]):
@@ -14,12 +14,14 @@ class CustomFormatter(logging.Formatter):
                 setattr(record, attr, '')
         return super().format(record)
 
+#https://docs.python.org/3/library/logging.html#logrecord-attributes
+logrecord_attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message', 'domain']
+custom_attributes_list = ['env', 'domain']
+all_attributes_list = logrecord_attributes_list + custom_attributes_list
+formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(all_attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \
+                            attributes_list=all_attributes_list)
 
-attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message', 'domain']
-formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \
-                            attributes_list=attributes_list)
-
-kusto_handler = KustoHandler('Vmainsight', 'vmadbexp', 'log_test', attributes_list)
+kusto_handler = KustoHandler('Vmainsight', 'vmadbexp', 'log_test', all_attributes_list)
 kusto_handler.setLevel(logging.INFO)
 kusto_handler.setFormatter(formatter)
 
@@ -31,7 +33,7 @@ d = {'env':'stage', 'domain':'xyz'}
 while True:
     log = input("> ")
     if log.strip().lower() != "quit":
-        logger.info(log)
+        logger.warn(log)
         logger.info(log, extra=d)
     else:
         break

@@ -24,7 +24,7 @@ class KustoHandler(logging.Handler):
     def flush(self):
         log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
         print(log_df)
-        #self.db_conn.write_pandas_to_table(log_df, self.tablename)
+        self.db_conn.write_pandas_to_table(log_df, self.tablename)
 
     def close(self):
         super().close()

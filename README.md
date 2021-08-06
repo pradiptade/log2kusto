@@ -10,6 +10,10 @@ Use the package manager [pip](link will be updated) to install foobar.
 pip install log2kusto
 ```
 
+# Requirments
+- Python logging library
+- An MS internal library for providing credentials to authenticate to Kusto (working on making it open source.)
+
 ## Usage
 
 ```python

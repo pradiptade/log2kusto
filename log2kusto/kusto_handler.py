@@ -18,13 +18,12 @@ class KustoHandler(logging.Handler):
     def emit(self, record):
         self.format(record)
         record_values = [record.__dict__[k] for k in self.attributes]
-        print(record_values)
         self.log_rows_list.append(record_values)
         
     def flush(self):
         log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
-        print(log_df)
         self.db_conn.write_pandas_to_table(log_df, self.tablename)
+        print("\n Logs written to: cluster('{0}').database('{1}').{2}".format(self.cluster, self.database,self.tablename))
 
     def close(self):
         super().close()

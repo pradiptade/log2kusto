@@ -1,18 +1,24 @@
 import logging
 from log2kusto.kusto_handler import KustoHandler
 
+def get_extra_field(keyname, val):
+    return {keyname:val}
 
-def send_info(log, d={}):
+def send_info(log:str, dimensions:str = ''):
+    d = get_extra_field("dimensions", dimensions )
     logger.info(log, extra=d)
 
-def send_warn(log, d={}):
-    logger.warn(log)
+def send_warn(log:str, dimensions:str = ''):
+    d = get_extra_field("dimensions", dimensions )
+    logger.warning(log, extra=d)
 
-def send_error(log, d={}):
-    logger.error(log)
+def send_error(log:str, dimensions:str = ''):
+    d = get_extra_field("dimensions", dimensions )
+    logger.error(log, extra=d)
 
-def send_critical(log, d={}):
-    logger.critical(log)
+def send_critical(log:str, dimensions:str = ''):
+    d = get_extra_field("dimensions", dimensions )
+    logger.critical(log, extra=d)
 class CustomFormatter(logging.Formatter):
     def __init__(self, fmt=None, datefmt=None, style='%', validate=True, attributes_list=[]):
         super().__init__(fmt, datefmt, style, validate)
@@ -28,7 +34,7 @@ class CustomFormatter(logging.Formatter):
 
 #https://docs.python.org/3/library/logging.html#logrecord-attributes
 logrecord_attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message']
-custom_attributes_list = ['env', 'domain']
+custom_attributes_list = ['dimensions']
 all_attributes_list = logrecord_attributes_list + custom_attributes_list
 formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(all_attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \
                             attributes_list=all_attributes_list)
@@ -41,14 +47,13 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(kusto_handler)
 
-d = {'env':'stage', 'domain':'azqualify'}
 while True:
     log = input("> ")
     if log.strip().lower() != "quit":
-        send_info(log, d)
-        send_warn(log, d)
+        send_info(log, "extra message")
+        send_warn(log, "key1:val1, key2:val2")
         send_error(log)
-        send_critical(log)
+        send_critical(log, "exception")
     else:
         break
 

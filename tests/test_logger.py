@@ -25,16 +25,16 @@ class CustomFormatter(logging.Formatter):
         self.attributes = attributes_list
 
     def format(self, record):
-        print("in format")
+        #print("in format")
         for attr in self.attributes:
-            print(attr)
+            #print(attr)
             if not hasattr(record, attr):
                 setattr(record, attr, '')
         return super().format(record)
 
 #https://docs.python.org/3/library/logging.html#logrecord-attributes
-logrecord_attributes_list = ['asctime', 'levelname', 'filename', 'funcName', 'module', 'message']
-custom_attributes_list = ['dimensions']
+logrecord_attributes_list = ['asctime', 'levelname', 'funcName', 'module', 'message']
+custom_attributes_list = ['dimensions', 'project_name']
 all_attributes_list = logrecord_attributes_list + custom_attributes_list
 formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(all_attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \
                             attributes_list=all_attributes_list)
@@ -46,6 +46,8 @@ kusto_handler.setFormatter(formatter)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(kusto_handler)
+
+logger = logging.LoggerAdapter(logger, {"project_name":"test"})
 
 while True:
     log = input("> ")

@@ -39,7 +39,7 @@ all_attributes_list = logrecord_attributes_list + custom_attributes_list
 formatter = CustomFormatter('%(' + ((')s' + " ; " + '%(').join(all_attributes_list)) + ')s', "%Y-%m-%d %H:%M:%S", \
                             attributes_list=all_attributes_list)
 
-kusto_handler = KustoHandler('Vmainsight', 'vmadbexp', 'log_test', all_attributes_list)
+kusto_handler = KustoHandler('https://ingest-vmainsight.kusto.windows.net/', 'vmadbexp', 'log_test', all_attributes_list)
 kusto_handler.setLevel(logging.INFO)
 kusto_handler.setFormatter(formatter)
 
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(kusto_handler)
 
-logger = logging.LoggerAdapter(logger, {"project_name":"test"})
+#logger = logging.LoggerAdapter(logger, {"project_name":"test"})
 
 while True:
     log = input("> ")
@@ -58,4 +58,6 @@ while True:
         send_critical(log, "exception")
     else:
         break
+
+logger.handlers[0].flush_writes()
 

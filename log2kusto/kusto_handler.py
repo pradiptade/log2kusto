@@ -36,7 +36,8 @@ class KustoHandler(logging.Handler):
             .format(len(self.log_rows_list), self.cluster, self.database, self.tablename))
 
     def flush(self):
-        self.flush_writes()
+        pass
+        #self.flush_writes()
 
     def close(self):
         super().close()

@@ -1,6 +1,22 @@
+'''
+
+self.flush_writes() called inside self.flush()
+Use asyncio to run self.flush_writes() synchronously in self.flush() function
+
+Idea is to make event loop run self.flush_writes() through self.flush() and  
+wait until its completion before running other functions
+
+Errors: 
+- can't register atexit after shutdown 
+- KustoAuthenticationError (invalid client secret)
+
+'''
+print('importing KustoHandler from kusto_handler_4.py')
+
 import logging
 import pandas as pd
 import kusto_tools.k_io.kusto_io as kio
+import asyncio 
 
 
 class KustoHandler(logging.Handler):
@@ -29,19 +45,21 @@ class KustoHandler(logging.Handler):
         self.log_rows_list.append(record_values)
         #print(self.log_rows_list)
         
-    def flush_writes(self):
+    async def flush_writes(self):
         log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
-        self.db_conn.write_pandas_to_table(log_df, self.tablename)
+        async def coroutine():
+            self.db_conn.write_pandas_to_table(log_df, self.tablename)
+        task = asyncio.create_task(coroutine())
+        await task
         print("\n {0} log records written to: cluster('{1}').database('{2}').{3}"\
             .format(len(self.log_rows_list), self.cluster, self.database, self.tablename))
 
     def flush(self):
         pass
-        log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
-        self.db_conn.write_pandas_to_table(log_df, self.tablename)
-        print("\n {0} log records written to: cluster('{1}').database('{2}').{3}"\
-            .format(len(self.log_rows_list), self.cluster, self.database, self.tablename))
-        #self.flush_writes()
+        loop = asyncio.get_event_loop()
+        coroutine = self.flush_writes()
+        loop.run_until_complete(coroutine)
+        
 
     def close(self):
         super().close()

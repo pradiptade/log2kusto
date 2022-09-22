@@ -1,13 +1,14 @@
 import logging
-from log2kusto.kusto_handler import KustoHandler
-
+from re import S
+from log2kusto.kusto_handler import KustoHandler # change this import as needed
+import threading
 # each test case is a tuple with the following values:
 # cluster, database, table, and boolean value for if an Exception should be raised
 TEST_CASES = [ 
     ('https://ingest-vmainsight.kusto.windows.net/', 'vmadbexp', 'log_test', 
         False), 
-    ('https://ingest-vmainsight.kusto.windows.net/', 'vmadbexp', 
-        'nonexistent_table', True),
+    # ('https://ingest-vmainsight.kusto.windows.net/', 'vmadbexp', 
+    #     'nonexistent_table', True),
 ]
 
 def test_logger_single_case(cluster, db, table):
@@ -15,6 +16,7 @@ def test_logger_single_case(cluster, db, table):
         return {keyname:val}
 
     def send_info(log:str, dimensions:str = ''):
+        # print(f'Thread count: {len(threading.enumerate())}')
         d = get_extra_field("dimensions", dimensions )
         logger.info(log, extra=d)
 
@@ -61,17 +63,21 @@ def test_logger_single_case(cluster, db, table):
 
     #logger = logging.LoggerAdapter(logger, {"project_name":"test"})
 
-    while True:
-        log = input("> ")
-        if log.strip().lower() != "quit":
-            send_info(log, "extra message")
-            send_warn(log, "key1:val1, key2:val2")
-            send_error(log)
-            send_critical(log, "exception")
-        else:
-            break
-
-    logger.handlers[0].flush_writes()
+    # while True:
+    #     log = input("> ")
+    #     if log.strip().lower() != "quit":
+    #         send_info(log, "extra message")
+    #         send_warn(log, "key1:val1, key2:val2")
+    #         send_error(log)
+    #         send_critical(log, "exception")
+    #     else:
+    #         break
+    # print('Thread count: ', len(threading.enumerate()))
+    l = ['qwerty', 'asdf']
+    for w in l: 
+        send_info(w, "extra message")
+        
+    # logger.handlers[0].flush_writes() # if flush() implemented correctly, this call is not needed
 
 def test_logger(): 
     # test logger against every test case 
@@ -89,11 +95,12 @@ def test_logger():
                 print(f'\nTest case {i + 1} failed, Exception should have '
                     + 'been thrown\n')
                 test_results.append(0)
-        except: 
+        except Exception as e: 
             if exception: 
                 print(f'\nTest case {i + 1} passed, Exception thrown\n')
                 test_results.append(1)
             else: 
+                print(e.with_traceback())
                 print(f'\nTest case {i + 1} failed, Exception should not have '
                     + 'been thrown\n')
                 test_results.append(0)
@@ -102,6 +109,9 @@ def test_logger():
     print('Test case summary:')
     for i in range(len(TEST_CASES)):
         res = 'PASSED' if test_results[i] == 1 else 'FAILED'
+        cluster = TEST_CASES[i][0]
+        db = TEST_CASES[i][1]
+        table = TEST_CASES[i][2]
         print(f'Test case {i + 1} (Cluster: {cluster}, Database: {db}'
             + f' Table: {table}) - {res}')
 

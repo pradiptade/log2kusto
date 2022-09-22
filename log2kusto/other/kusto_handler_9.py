@@ -1,3 +1,14 @@
+'''
+
+self.flush_writes() called inside self.flush()
+
+Errors: 
+- can't register atexit after shutdown 
+- KustoAuthenticationError (invalid client secret)
+
+'''
+print('importing KustoHandler from kusto_handler_1.py')
+
 import logging
 import pandas as pd
 import kusto_tools.k_io.kusto_io as kio
@@ -37,11 +48,7 @@ class KustoHandler(logging.Handler):
 
     def flush(self):
         pass
-        log_df = pd.DataFrame(self.log_rows_list, columns=self.attributes)
-        self.db_conn.write_pandas_to_table(log_df, self.tablename)
-        print("\n {0} log records written to: cluster('{1}').database('{2}').{3}"\
-            .format(len(self.log_rows_list), self.cluster, self.database, self.tablename))
-        #self.flush_writes()
+        self.flush_writes()
 
     def close(self):
         super().close()

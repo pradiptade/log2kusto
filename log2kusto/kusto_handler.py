@@ -4,20 +4,22 @@ import kusto_tools.k_io.kusto_io as kio
 
 
 class KustoHandler(logging.Handler):
-    def __init__(self, cluster:str, database:str, tablename:str, attributes_list:list) -> None:
+    def __init__(self, cluster:str, database:str, tablename:str, attributes_list:list, linked_service_name:str=None) -> None:
         """Constructor
         Args:
             cluster: kusto cluster name
             database: kusto database
             table (string): table name
             attributes_list: The list of attributes that maps to the schema of the table.
+            linked_service_name: linked service for authenticating using Managed Identity
         """
         super().__init__()
         
         self.cluster = cluster
         self.database = database
         self.tablename = tablename
-        self.db_conn = kio.KustoIngest(kusto_ingest_cluster=self.cluster, kusto_database=self.database)
+        self.linked_service_name = linked_service_name
+        self.db_conn = kio.KustoIngest(kusto_ingest_cluster=self.cluster, kusto_database=self.database, linked_service_name=self.linked_service_name)
         self.attributes = attributes_list
 
         self.log_rows_list = []
